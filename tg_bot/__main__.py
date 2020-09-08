@@ -18,42 +18,34 @@ from tg_bot.modules.helper_funcs.chat_status import is_user_admin
 from tg_bot.modules.helper_funcs.misc import paginate_modules
 
 PM_START_TEXT = """
-hoi {}, my name is {}! if you have any questions about how to use me please give me /help... 
+HI {}, my name is {}! if you have any questions about how to use me please give me /help... 
 
-im a group manager bot maintained by  [this person](tg://user?id={}).
+I am a group manager bot maintained by  [this person](tg://user?id={}).
 
-My future updates will be put into This Channel - @MarieChechi & My Support Group @InFoTelGroup.
-
-This is my [Deploy Code](https://heroku.com/deploy?template=https://github.com/TGExplore/Marie-2.0-English),
-you can create clone same like me..
+My future updates will be put into This Channel - @JarvisOT & My Support Group @JarvisSupportOT.
 
 For more commands click /help...
 
-**Keep in mind that any changes you DO do to the source have to be on github, as per the license.**
-
 """
+
 
 HELP_STRINGS = """
 
 Hello! my name *{}*.
 
 *Main* available commands:
- - /start: Start the bot...
- - /help: help....
- - /donate: To find out more about donating!
- - /settings:
-   - in PM: To find out what SETTINGS you have set....
-   - in a group:
+  💠 /start: Start the bot...
+  💠 /help: help....
+  💠 /donate: To find out more about donating!
+  💠 /settings:
+   🔹 in PM: To find out what SETTINGS you have set....
+   🔹 in a group:
 
 {}
 And the following:
 """.format(dispatcher.bot.first_name, "" if not ALLOW_EXCL else "\nAll of the following commands  / or ! can  be used...\n")
 
-DONATE_STRING = """Heya, glad to hear you want to donate!
-It took lots of work for [my creator](t.me/SonOfLars) to get me to where I am now, and every donation helps \
-motivate him to make me even better. All the donation money will go to a better VPS to host me, and/or beer \
-(see his bio!). He's just a poor student, so every little helps!
-There are two ways of paying him; [PayPal](paypal.me/PaulSonOfLars), or [Monzo](monzo.me/paulnionvestergaardlarsen)."""
+DONATE_STRING = """Heya, Glad to Hear You Want To Donate! Donation Link Will be Given Soon."""
 
 IMPORTED = {}
 MIGRATEABLE = []
@@ -65,6 +57,14 @@ DATA_EXPORT = []
 
 CHAT_SETTINGS = {}
 USER_SETTINGS = {}
+
+GDPR = []
+
+START_IMG = os.environ.get('START_IMG', None)
+if START_IMG is None:
+    img = "https://telegra.ph/file/20a1f36d71423d0e54e11.jpg"
+else:
+  img = START_IMG
 
 for module_name in ALL_MODULES:
     imported_module = importlib.import_module("tg_bot.modules." + module_name)
@@ -145,9 +145,34 @@ def start(bot: Bot, update: Update, args: List[str]):
                 PM_START_TEXT.format(escape_markdown(first_name), escape_markdown(bot.first_name), OWNER_ID),
                 parse_mode=ParseMode.MARKDOWN)
     else:
-        update.effective_message.reply_text("waked up😏😏😏")
+        update.effective_message.reply_text("Heya,{} Here..\nHow can I help you? 🙂".format(bot.first_name),reply_markup=InlineKeyboardMarkup(
+                                                [[InlineKeyboardButton(text="⚜️Help",url="t.me/{}?start=help".format(bot.username))]]))
+
+def send_start(bot, update):
+    #Try to remove old message
+    try:
+        query = update.callback_query
+        query.message.delete()
+    except:
+        pass
+
+    chat = update.effective_chat  # type: Optional[Chat]
+    first_name = update.effective_user.first_name 
+    text = PM_START_TEXT
+
+    keyboard = [[InlineKeyboardButton(text="🤝Help",callback_data="help_back"),InlineKeyboardButton(text="🛡Support🛡",url="https://t.me/jarvissupportot")]]
+    keyboard += [[InlineKeyboardButton(text="🌐Update Channel", url="https://t.me/jarvisot"),InlineKeyboardButton(text="⚜️Add Me⚜️",url="t.me/{}?startgroup=true".format(bot.username))]]
+
+    update.effective_message.reply_photo(img, PM_START_TEXT.format(escape_markdown(first_name), escape_markdown(bot.first_name), OWNER_NAME, OWNER_ID), 
+                                         reply_markup=InlineKeyboardMarkup(keyboard), disable_web_page_preview=True, parse_mode=ParseMode.MARKDOWN)
 
 
+def m_connect_button(bot, update):
+    bot.delete_message(update.effective_chat.id, update.effective_message.message_id)
+    connect_button(bot, update)
+
+        
+        
 # for test purposes
 def error_callback(bot, update, error):
     try:
