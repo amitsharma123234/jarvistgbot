@@ -15,8 +15,6 @@ class Disable(BASE):
 
     def __repr__(self):
         return "Disabled cmd {} in {}".format(self.command, self.chat_id)
-
-
 Disable.__table__.create(checkfirst=True)
 DISABLE_INSERTION_LOCK = threading.RLock()
 
