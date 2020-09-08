@@ -1,8 +1,7 @@
 import threading
 
-from sqlalchemy import Column, String, UnicodeText, func, distinct
-
-from tg_bot.modules.sql import SESSION, BASE
+from tg_bot.modules.sql import BASE, SESSION
+from sqlalchemy import Column, String, UnicodeText, distinct, func
 
 
 class Disable(BASE):
@@ -57,7 +56,7 @@ def enable_command(chat_id, enable):
 
 
 def is_command_disabled(chat_id, cmd):
-    return cmd in DISABLED.get(str(chat_id), set())
+    return str(cmd).lower() in DISABLED.get(str(chat_id), set())
 
 
 def get_all_disabled(chat_id):
@@ -80,7 +79,8 @@ def num_disabled():
 
 def migrate_chat(old_chat_id, new_chat_id):
     with DISABLE_INSERTION_LOCK:
-        chats = SESSION.query(Disable).filter(Disable.chat_id == str(old_chat_id)).all()
+        chats = SESSION.query(Disable).filter(
+            Disable.chat_id == str(old_chat_id)).all()
         for chat in chats:
             chat.chat_id = str(new_chat_id)
             SESSION.add(chat)
