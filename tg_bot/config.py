@@ -14,3 +14,4 @@ class Development(Config):
     SUPPORT_USERS = [1365686472]
     WORKERS = 8
     ENV = "ANYTHING"
+    STRICT_GMUTE = False
